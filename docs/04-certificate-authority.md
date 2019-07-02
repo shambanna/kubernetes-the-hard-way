@@ -68,7 +68,8 @@ Generate the `admin` client certificate and private key:
 
 ```
 {
-
+mkdir admin
+cd admin
 cat > admin-csr.json <<EOF
 {
   "CN": "admin",
@@ -90,11 +91,11 @@ EOF
 
 cfssl gencert \
   -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
+  -ca-key=../ca-key.pem \
+  -config=../ca-config.json \
   -profile=kubernetes \
   admin-csr.json | cfssljson -bare admin
-
+cd ..
 }
 ```
 
@@ -113,6 +114,8 @@ Generate a certificate and private key for each Kubernetes worker node:
 
 ```
 for instance in worker-0 worker-1 worker-2; do
+mkdir ${instance}
+cd ${instance}
 cat > ${instance}-csr.json <<EOF
 {
   "CN": "system:node:${instance}",
@@ -140,11 +143,12 @@ INTERNAL_IP=$(gcloud compute instances describe ${instance} \
 
 cfssl gencert \
   -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
+  -ca-key=../ca-key.pem \
+  -config=../ca-config.json \
   -hostname=${instance},${EXTERNAL_IP},${INTERNAL_IP} \
   -profile=kubernetes \
   ${instance}-csr.json | cfssljson -bare ${instance}
+  cd ..
 done
 ```
 
@@ -165,7 +169,8 @@ Generate the `kube-controller-manager` client certificate and private key:
 
 ```
 {
-
+mkdir kube-controller-manager
+cd kube-controller-manager
 cat > kube-controller-manager-csr.json <<EOF
 {
   "CN": "system:kube-controller-manager",
@@ -191,7 +196,7 @@ cfssl gencert \
   -config=ca-config.json \
   -profile=kubernetes \
   kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
-
+cd ..
 }
 ```
 
@@ -209,7 +214,8 @@ Generate the `kube-proxy` client certificate and private key:
 
 ```
 {
-
+mkdir kube-proxy
+cd kube-proxy
 cat > kube-proxy-csr.json <<EOF
 {
   "CN": "system:kube-proxy",
@@ -231,11 +237,11 @@ EOF
 
 cfssl gencert \
   -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
+  -ca-key=../ca-key.pem \
+  -config=../ca-config.json \
   -profile=kubernetes \
   kube-proxy-csr.json | cfssljson -bare kube-proxy
-
+ cd ..
 }
 ```
 
@@ -252,7 +258,8 @@ Generate the `kube-scheduler` client certificate and private key:
 
 ```
 {
-
+mkdir kube-scheduler
+cd kube-scheduler
 cat > kube-scheduler-csr.json <<EOF
 {
   "CN": "system:kube-scheduler",
@@ -274,11 +281,11 @@ EOF
 
 cfssl gencert \
   -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
+  -ca-key=../ca-key.pem \
+  -config=../ca-config.json \
   -profile=kubernetes \
   kube-scheduler-csr.json | cfssljson -bare kube-scheduler
-
+cd ..
 }
 ```
 
@@ -370,8 +377,8 @@ EOF
 
 cfssl gencert \
   -ca=ca.pem \
-  -ca-key=ca-key.pem \
-  -config=ca-config.json \
+  -ca-key=../ca-key.pem \
+  -config=../ca-config.json \
   -profile=kubernetes \
   service-account-csr.json | cfssljson -bare service-account
 
